@@ -19,11 +19,11 @@ public:
     unsigned long long int dark = 0;
     bool turn = true;
 
-    void make_move(unsigned long long int& move);
+    void make_move(int& move);
     void print_board();
     bool is_terminal();
     int result();
-    vector<unsigned long long int> get_moves();
+    vector<int> get_moves();
     int simulate();
 
 private:

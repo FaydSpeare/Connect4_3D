@@ -7,11 +7,11 @@
 
 using namespace std;
 
-void Game::make_move(unsigned long long int& move) {
+void Game::make_move(int& move) {
     if(turn){
-        light |= move;
+        light |= (1ULL << move);
     } else {
-        dark |= move;
+        dark |= (1ULL << move);
     }
     turn = !turn;
 }
@@ -69,7 +69,7 @@ int Game::result() {
 }
 
 int Game::simulate() {
-    vector<unsigned long long int> moves = get_moves();
+    vector<int> moves = get_moves();
 
     unsigned seed = 55;
     std::mt19937 random(seed);
@@ -77,7 +77,7 @@ int Game::simulate() {
     while(!is_terminal()){
 
         int rand_int = random() % moves.size();
-        unsigned long long int move = moves[rand_int];
+        int move = moves[rand_int];
         make_move(move);
         moves[rand_int] = moves.back();
         moves.pop_back();
@@ -89,34 +89,19 @@ int Game::simulate() {
 
 }
 
-vector<unsigned long long int> Game::get_moves() {
+vector<int> Game::get_moves() {
 
-    vector<unsigned long long int> moves;
+    vector<int> moves;
     unsigned long long int empty = ~(dark | light);
-    unsigned long long int j;
-    for(unsigned int i = 0; i < 16; i++){
-
-        j = (1ULL << i);
-        if(empty & j){
-            moves.push_back(j);
-            continue;
+    for(int i = 0; i < 16; i++){
+        for(int j = 0; j < 4; j++){
+            int k = (i + 16*j);
+            if(empty & (1ULL << k)){
+                moves.push_back(k);
+                break;
+            }
         }
-        j = (1ULL << (i+16));
-        if(empty & j){
-            moves.push_back(j);
-            continue;
-        }
-        j = (1ULL << (i+32));
-        if(empty & j){
-            moves.push_back(j);
-            continue;
-        }
-        j = (1ULL << (i+48));
-        if(empty & j){
-            moves.push_back(j);
-            continue;}
     }
-
     return moves;
 }
 
