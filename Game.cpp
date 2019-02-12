@@ -3,7 +3,7 @@
 //
 
 #include "Game.h"
-
+#include <random>
 
 using namespace std;
 
@@ -68,6 +68,27 @@ int Game::result() {
     return 0;
 }
 
+int Game::simulate() {
+    vector<unsigned long long int> moves = get_moves();
+
+    unsigned seed = 55;
+    std::mt19937 random(seed);
+
+    while(!is_terminal()){
+
+        int rand_int = random() % moves.size();
+        unsigned long long int move = moves[rand_int];
+        make_move(move);
+        moves[rand_int] = moves.back();
+        moves.pop_back();
+
+        if(move < 48) moves.push_back(move + 16);
+
+    }
+    return 1;
+
+}
+
 vector<unsigned long long int> Game::get_moves() {
 
     vector<unsigned long long int> moves;
@@ -98,6 +119,7 @@ vector<unsigned long long int> Game::get_moves() {
 
     return moves;
 }
+
 
 /*
  * Alternative get_moves()

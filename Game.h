@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -23,9 +24,10 @@ public:
     bool is_terminal();
     int result();
     vector<unsigned long long int> get_moves();
-
+    int simulate();
 
 private:
+
     const unsigned int win_list[76][4] = {
             {0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15},
             {0, 5, 10, 15}, {3, 6, 9, 12}, {0, 4, 8, 12}, {1, 5, 9, 13},
@@ -47,6 +49,8 @@ private:
             {0, 20, 40, 60}, {1, 21, 41, 61}, {2, 22, 42, 62}, {3, 23, 43, 63},
             {12, 24, 36, 48}, {13, 25, 37, 49}, {14, 26, 38, 50}, {15, 27, 39, 51}
     };
+
+
 };
 
 

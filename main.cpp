@@ -9,22 +9,12 @@ using namespace std;
 
 int main() {
 
-    auto start = chrono::steady_clock::now( );
-    int k = 0;
-
+    auto start = chrono::steady_clock::now();
     vector<unsigned long long int> moves;
-    std::mt19937 rng;
 
-    for(int i = 0; i < 10000; i++){
+    for(int i = 0; i < 100000; i++){
         Game game{};
-
-        while(!game.is_terminal()){
-            moves = game.get_moves();
-
-            std::uniform_int_distribution<std::mt19937::result_type> dist6(0,moves.size()-1);
-            game.make_move(moves[dist6(rng)]);
-            k++;
-        }
+        game.simulate(1);
     }
 
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now( ) - start );
