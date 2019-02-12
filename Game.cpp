@@ -100,6 +100,7 @@ vector<unsigned long long int> Game::get_moves() {
 }
 
 /*
+ * Alternative get_moves()
  *
     for(int i = 0; i < 16; i++){
         for(int j = 0; j < 4; j++){

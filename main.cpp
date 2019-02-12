@@ -7,13 +7,6 @@
 
 using namespace std;
 
-struct State {
-    unsigned long long int light = 0;
-    unsigned long long int dark = 0;
-    bool turn = true;
-};
-
-
 int main() {
 
     auto start = chrono::steady_clock::now( );
