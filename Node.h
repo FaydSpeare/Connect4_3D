@@ -6,6 +6,9 @@
 #define STACKGAME_NODE_H
 
 #include <vector>
+#include <stdlib.h>
+#include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -22,11 +25,13 @@ public:
         bool turn = true;
     };
 
-    double wins;
-    double visits;
+    double uct_score;
+
+    int wins = 0;
+    int visits = 0;
     Node *parent;
     int last_move;
-    bool terminal_value;
+    int terminal_value;
     int terminal_depth;
     vector<int> all_moves;
     vector<int> to_expand;
@@ -37,20 +42,17 @@ public:
 
     void update(int value);
     void set_terminal(bool terminal);
-    void set_terminal_value(bool terminal_value);
+    void set_terminal_value(int terminal_value, int depth);
     vector<Node*> get_children();
     int get_last_move();
     Node* get_child(int move);
-    Node(State s, vector<int> &moves);
+    Node(Node::State s, vector<int> moves);
     int get_random_move();
     Node make_move(int move);
     bool is_expandable();
     double uct();
     Node select_child();
-
-
-
-
+    bool is_terminal();
 
 };
 

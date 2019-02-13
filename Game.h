@@ -9,26 +9,16 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include "Node.h"
 
 using namespace std;
+
+
 
 class Game {
 
 public:
-    unsigned long long int light = 0;
-    unsigned long long int dark = 0;
-    bool turn = true;
-
-    void make_move(int& move);
-    void print_board();
-    bool is_terminal();
-    int result();
-    vector<int> get_moves();
-    int simulate();
-
-private:
-
-    const unsigned int win_list[76][4] = {
+    static constexpr unsigned int win_list[76][4] = {
             {0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15},
             {0, 5, 10, 15}, {3, 6, 9, 12}, {0, 4, 8, 12}, {1, 5, 9, 13},
             {2, 6, 10, 14}, {3, 7, 11, 15}, {16, 17, 18, 19}, {20, 21, 22, 23},
@@ -49,6 +39,14 @@ private:
             {0, 20, 40, 60}, {1, 21, 41, 61}, {2, 22, 42, 62}, {3, 23, 43, 63},
             {12, 24, 36, 48}, {13, 25, 37, 49}, {14, 26, 38, 50}, {15, 27, 39, 51}
     };
+
+    static void make_move(int& move, unsigned long long int &light, unsigned long long int &dark, bool &turn);
+    static void print_board(unsigned long long int &light, unsigned long long int &dark);
+    static bool is_terminal(unsigned long long int &light, unsigned long long int &dark);
+    static int result(unsigned long long int &light, unsigned long long int &dark);
+    static vector<int> get_moves(unsigned long long int &light, unsigned long long int &dark);
+    static int simulate(unsigned long long int light, unsigned long long int dark, bool turn);
+    static int runUCT(Node::State s);
 
 
 };

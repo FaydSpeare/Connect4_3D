@@ -25,10 +25,20 @@ void Node::update(int value) {
 }
 
 Node Node::select_child() {
+    cout << "NOOO";
+    cout << children[0]->wins;
+    cout << "ok";
     Node *best_node = nullptr;
-    double best_score = children[0] -> uct();
+    cout << "NOOO";
+    double expand = std::sqrt(3.0 * std::log(double((children[0]->parent)->visits))/double(children[0]->visits));
+    cout << "NOOO";
+    if(children[0]->board.turn) expand *= -1.0;
+    double best_score = double(children[0]->wins)/double(children[0]->visits) + expand;
+
 
     if(!board.turn){
+
+        best_score++;
         for(Node* n: children){
             double uct = n -> uct();
             if(uct <= best_score){
@@ -37,8 +47,14 @@ Node Node::select_child() {
             }
         }
     } else {
+        best_score--;
         for(Node* n: children){
-            double uct = n -> uct();
+
+            double expand = std::sqrt(3.0 * std::log(double(n->parent->visits))/double(n->visits));
+            if(n->board.turn) expand *= -1.0;
+            double uct = double(n->wins)/double(n->visits) + expand;
+
+
             if(uct >= best_score){
                 best_node = n;
                 best_score = uct;
@@ -49,9 +65,10 @@ Node Node::select_child() {
 }
 
 double Node::uct(){
-    double expand = sqrt(3*log(parent->visits)/visits);
-    if(board.turn) expand *= -1;
-    return wins/visits + expand;
+    double expand = std::sqrt(3.0 * std::log(double(parent->visits))/double(this->visits));
+    cerr << expand << "  ";
+    if(board.turn) expand *= -1.0;
+    return double(double(this->wins)/double(this->visits) + expand);
 }
 
 bool Node::is_expandable() {
@@ -83,7 +100,7 @@ int Node::get_random_move() {
     return move;
 }
 
-Node::Node(State s, vector<int> &moves) {
+Node::Node(Node::State s, vector<int> const moves) {
     board = s;
     this->parent = nullptr;
     all_moves = moves;
@@ -94,8 +111,38 @@ void Node::set_terminal(bool terminal) {
     this -> terminal = terminal;
 }
 
-void Node::set_terminal_value(bool terminal_value) {
+void Node::set_terminal_value(int terminal_value, int depth) {
     this -> terminal_value = terminal_value;
+    terminal_depth = depth;
+    terminal = true;
+
+    if(parent != nullptr){
+        depth++;
+
+        if(parent -> board.turn){
+            if(terminal_value == 2){
+                parent -> set_terminal_value(terminal_value, depth);
+            }
+            else if(terminal_value == -2){
+                parent -> terminal_sum += terminal_value;
+                if(parent -> terminal_sum / parent -> children.size() == -2){
+                    parent->set_terminal_value(terminal_value, depth);
+                }
+            }
+        }
+        else {
+            if(terminal_value == -2){
+                parent -> set_terminal_value(terminal_value, depth);
+            }
+            else if(terminal_value == 2){
+                parent -> terminal_sum += terminal_value;
+                if(parent -> terminal_sum / parent -> children.size() == 2){
+                    parent->set_terminal_value(terminal_value, depth);
+                }
+            }
+        }
+    }
+
 }
 
 vector<Node*> Node::get_children() {
@@ -112,4 +159,9 @@ Node* Node::get_child(int move) {
     }
     return nullptr;
 }
+
+bool Node::is_terminal() {
+    return terminal;
+}
+
 

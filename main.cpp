@@ -1,21 +1,26 @@
 #include <iostream>
 #include "Game.h"
+#include "Node.h"
 #include <bitset>
 #include <vector>
 #include <chrono>
 #include <random>
+#include <cmath>
 
 using namespace std;
 
 int main() {
 
     auto start = chrono::steady_clock::now();
-    vector<unsigned long long int> moves;
+    double k = 10;
+    cout << log10(20)/1.2;
+    Node::State state;
+    state.light = 0b0;
+    state.dark = 0b0;
+    state.turn = true;
+    Node n(state, Game::get_moves(state.light, state.dark));
 
-    for(int i = 0; i < 100000; i++){
-        Game game{};
-        game.simulate(1);
-    }
+    Game::runUCT(state);
 
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now( ) - start );
 
