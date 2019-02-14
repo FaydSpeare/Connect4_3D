@@ -1,0 +1,3 @@
+C:/Users/fspea/CLionProjects/Testing/cmake-build-debug/CMakeFiles/Testing.dir
+C:/Users/fspea/CLionProjects/Testing/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/fspea/CLionProjects/Testing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
