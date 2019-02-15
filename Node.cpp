@@ -3,6 +3,7 @@
 //
 
 #include "Node.h"
+#include <random>
 
 Node::Node(Node* parent, int move) {
 
@@ -44,7 +45,6 @@ Node* Node::select_child() {
 
     if(!board.turn){
 
-        best_score++;
         for(Node* n: children){
             double uct = n -> uct();
             if(uct <= best_score){
@@ -53,7 +53,6 @@ Node* Node::select_child() {
             }
         }
     } else {
-        best_score--;
         for(Node* n: children){
 
             double expand = std::sqrt(3.0 * std::log(double(n->parent->visits))/double(n->visits));
@@ -73,7 +72,7 @@ Node* Node::select_child() {
 }
 
 double Node::uct(){
-    double expand = std::sqrt(3.0 * std::log(double(parent->visits))/double(this->visits));
+    double expand = std::sqrt(2.5 * std::log(double(parent->visits))/double(this->visits));
     if(board.turn) expand *= -1.0;
     return double(this->wins)/double(this->visits) + expand;
 }
@@ -101,7 +100,9 @@ Node* Node::make_move(int move) {
 }
 
 int Node::get_random_move() {
-    int index = rand() % to_expand.size();
+    unsigned seed = std::random_device()();
+    std::mt19937 random(seed);
+    int index = random() % to_expand.size();
     int move = to_expand[index];
     to_expand[index] = to_expand.back();
     return move;

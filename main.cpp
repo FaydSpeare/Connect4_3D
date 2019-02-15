@@ -13,7 +13,6 @@ int main() {
 
     auto start = chrono::steady_clock::now();
     double k = 10;
-    cout << log10(20)/1.2;
     Node::State state;
     state.light = 0b0;
     state.dark = 0b0;

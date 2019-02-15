@@ -87,7 +87,7 @@ int Game::simulate(unsigned long long int light, unsigned long long int dark, bo
         moves.pop_back();
         if(move < 48) moves.push_back(move + 16);
     }
-    return 1;
+    return Game::result(light, dark);
 
 }
 
@@ -114,7 +114,7 @@ int Game::runUCT(Node::State s) {
     int it = 0;
 
 
-    while(it < 8000){
+    while(it < 100000){
         Node* node = root;
 
         //cout << it << " ";
@@ -165,7 +165,23 @@ int Game::runUCT(Node::State s) {
         expanded->update(result);
     }
 
-    cout << endl << "Depth: " << max_depth << endl;
+    Node* best_node = root->children[0];
+    double best_score = double(root->children[0]->wins) / double(root->children[0]->visits);
+
+    cout << endl << "Best Move: " << best_node->last_move << endl;
+
+    for(Node* n: root->children){
+        double score = double(n -> wins) / double(n -> visits);
+
+        cout << n->last_move << ": score: "<< score << " wins: "<<n->wins<<" visits: "<< n->visits << endl;
+        if(score >= best_score){
+            best_node = n;
+            best_score = score;
+        }
+    }
+
+
+    cout << endl << "Best Move: " << best_node->last_move << endl;
     return max_depth;
 }
 
