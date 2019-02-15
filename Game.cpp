@@ -76,7 +76,7 @@ int Game::result(unsigned long long int &light, unsigned long long int &dark) {
 int Game::simulate(unsigned long long int light, unsigned long long int dark, bool turn) {
     vector<int> moves = get_moves(light, dark);
 
-    unsigned seed = 55;
+    unsigned seed = std::random_device()();
     std::mt19937 random(seed);
 
     while(!Game::is_terminal(light, dark)){
@@ -113,9 +113,11 @@ int Game::runUCT(Node::State s) {
     int max_depth = 0;
     int it = 0;
 
-    Node* node = root;
-    while(it < 17){
 
+    while(it < 8000){
+        Node* node = root;
+
+        //cout << it << " ";
         it++;
 
         int depth = 0;
@@ -130,6 +132,7 @@ int Game::runUCT(Node::State s) {
          */
 
         while(!node->is_expandable()){ // O(1)
+            //cout << "here" << endl;
             node = node->select_child(); // O(n) n = 16
             depth++;
             if(node->is_terminal()){ // if is terminal O(1)
@@ -158,17 +161,11 @@ int Game::runUCT(Node::State s) {
         } else {
             //Game::print_board(expanded.board.light, expanded.board.dark);
             result = Game::simulate(expanded->board.light, expanded->board.dark, expanded->board.turn);
-            cout << "hello ";
-
         }
-        cout << (expanded->parent) <<" ";
-        cout << (expanded->parent)->parent << endl;
         expanded->update(result);
-
-
-
     }
 
+    cout << endl << "Depth: " << max_depth << endl;
     return max_depth;
 }
 

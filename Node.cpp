@@ -16,9 +16,6 @@ Node::Node(Node* parent, int move) {
     cout << parent << endl;
      */
 
-
-
-
     for(int i: parent -> all_moves){
         if(i != move) all_moves.push_back(i);
     }
@@ -37,13 +34,9 @@ void Node::update(int value) {
 }
 
 Node* Node::select_child() {
-    cout << "start select child" << endl;
-    cout << this << endl;
+    //cout << "start select child" << endl;
+    //cout << this << endl;
 
-
-    for(int i = 0; i < children.size(); i++){
-        //cout << " " << children[i];
-    }
 
     Node* best_node = children[0];
     double best_score = children[0] -> uct();
@@ -74,8 +67,8 @@ Node* Node::select_child() {
             }
         }
     }
-    cout << "end select child" << endl;
-
+    //cout << best_node << endl;
+    //cout << "end select child" << endl;
     return best_node;
 }
 
