@@ -115,16 +115,9 @@ int Game::runUCT(Node::State s) {
         it++;
 
         int depth = 0;
-        /*
-        cout << node.to_expand.size() << endl;
-        for(int i: node.to_expand){
-            cout << " " << i;
-        }
-         */
+
         while(!node.is_expandable()){ // O(1)
-            cout << "no";
             node = node.select_child(); // O(n) n = 16
-            cout << "no";
             depth++;
             if(node.is_terminal()){ // if is terminal O(1)
                 break;

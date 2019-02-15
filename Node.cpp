@@ -4,7 +4,7 @@
 
 #include "Node.h"
 
-Node::Node(Node *parent, int move) {
+Node::Node(Node* parent, int move) {
     this -> parent = parent;
     last_move = move;
 
@@ -14,6 +14,8 @@ Node::Node(Node *parent, int move) {
     }
 
     to_expand = all_moves;
+
+    cout << "k: " << parent << endl;
 
     board = parent -> board;
 }
@@ -25,15 +27,15 @@ void Node::update(int value) {
 }
 
 Node Node::select_child() {
-    cout << "NOOO";
-    cout << children[0]->wins;
-    cout << "ok";
+    cout << "start select child" << endl;
+    cout << this << endl;
+
+    for(Node* n: children){
+        cout << " " << n->parent;
+    }
+
     Node *best_node = nullptr;
-    cout << "NOOO";
-    double expand = std::sqrt(3.0 * std::log(double((children[0]->parent)->visits))/double(children[0]->visits));
-    cout << "NOOO";
-    if(children[0]->board.turn) expand *= -1.0;
-    double best_score = double(children[0]->wins)/double(children[0]->visits) + expand;
+    double best_score = children[0] -> uct();
 
 
     if(!board.turn){
@@ -61,14 +63,15 @@ Node Node::select_child() {
             }
         }
     }
+    cout << "end select child" << endl;
+
     return *best_node;
 }
 
 double Node::uct(){
     double expand = std::sqrt(3.0 * std::log(double(parent->visits))/double(this->visits));
-    cerr << expand << "  ";
     if(board.turn) expand *= -1.0;
-    return double(double(this->wins)/double(this->visits) + expand);
+    return double(this->wins)/double(this->visits) + expand;
 }
 
 bool Node::is_expandable() {
@@ -102,7 +105,7 @@ int Node::get_random_move() {
 
 Node::Node(Node::State s, vector<int> const moves) {
     board = s;
-    this->parent = nullptr;
+    parent = nullptr;
     all_moves = moves;
     to_expand = all_moves;
 }
