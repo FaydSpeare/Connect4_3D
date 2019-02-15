@@ -116,6 +116,13 @@ int Game::runUCT(Node::State s) {
 
         int depth = 0;
 
+        cout<<it <<endl;
+        for(int i = 0; i < node.children.size(); i++){
+            cout << " node: " << node.children[i];
+            node.children[i];
+        }
+        cout<<endl;
+
         while(!node.is_expandable()){ // O(1)
             node = node.select_child(); // O(n) n = 16
             depth++;

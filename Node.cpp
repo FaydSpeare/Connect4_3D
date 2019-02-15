@@ -5,8 +5,18 @@
 #include "Node.h"
 
 Node::Node(Node* parent, int move) {
+
     this -> parent = parent;
     last_move = move;
+
+
+    /*
+    cout << this << endl;
+    cout << last_move << endl;
+    cout << parent << endl;
+     */
+
+
 
 
     for(int i: parent -> all_moves){
@@ -14,8 +24,6 @@ Node::Node(Node* parent, int move) {
     }
 
     to_expand = all_moves;
-
-    cout << "k: " << parent << endl;
 
     board = parent -> board;
 }
@@ -30,11 +38,11 @@ Node Node::select_child() {
     cout << "start select child" << endl;
     cout << this << endl;
 
-    for(Node* n: children){
-        cout << " " << n->parent;
+    for(int i = 0; i < children.size(); i++){
+        cout << " " << children[i];
     }
 
-    Node *best_node = nullptr;
+    Node* best_node = children[0];
     double best_score = children[0] -> uct();
 
 
@@ -79,21 +87,21 @@ bool Node::is_expandable() {
 }
 
 Node Node::make_move(int move) {
-    Node creation(this, move);
+    Node* creation = new Node(this, move);
 
     if(move < 48){
         int new_move = move + 16;
-        creation.to_expand.push_back(new_move);
-        creation.all_moves.push_back(new_move);
+        creation->to_expand.push_back(new_move);
+        creation->all_moves.push_back(new_move);
     }
 
-    if(board.turn) creation.board.light |= (1ULL << move);
-    else creation.board.dark |= (1ULL << move);
+    if(board.turn) creation->board.light |= (1ULL << move);
+    else creation->board.dark |= (1ULL << move);
 
-    creation.board.turn = !this -> board.turn;
-    children.push_back(&creation);
+    creation->board.turn = !this -> board.turn;
+    children.push_back(creation);
     to_expand.pop_back();
-    return creation;
+    return *creation;
 }
 
 int Node::get_random_move() {
