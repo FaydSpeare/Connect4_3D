@@ -22,8 +22,8 @@ void Game::print_board(unsigned long long int &light, unsigned long long int &da
     for(unsigned int i = 0; i < 64; i++){
         if(i % 4 == 0) cout << endl;
         if(i % 16 == 0) cout << endl;
-        if(light & (1ULL << i)) cout << "x";
-        else if(dark & (1ULL << i)) cout << "o";
+        if(light & (1ULL << i)) cout << "x ";
+        else if(dark & (1ULL << i)) cout << "o ";
         else cout << "- ";
     }
     cout << endl;
@@ -66,7 +66,11 @@ int Game::result(unsigned long long int &light, unsigned long long int &dark) {
             }
         }
     }
-    return 0;
+    if( ~(light | dark) == 0ULL){
+        return 0;
+    }
+
+    return -1;
 }
 
 int Game::simulate(unsigned long long int light, unsigned long long int dark, bool turn) {
@@ -104,53 +108,65 @@ vector<int> Game::get_moves(unsigned long long int &light, unsigned long long in
 }
 
 int Game::runUCT(Node::State s) {
-    Node root(s, get_moves(s.light, s.dark));
+    Node* root = new Node(s, get_moves(s.light, s.dark));
 
     int max_depth = 0;
     int it = 0;
 
-    Node node = root;
+    Node* node = root;
     while(it < 17){
 
         it++;
 
         int depth = 0;
 
+        /*
         cout<<it <<endl;
         for(int i = 0; i < node.children.size(); i++){
             cout << " node: " << node.children[i];
             node.children[i];
         }
         cout<<endl;
+         */
 
-        while(!node.is_expandable()){ // O(1)
-            node = node.select_child(); // O(n) n = 16
+        while(!node->is_expandable()){ // O(1)
+            node = node->select_child(); // O(n) n = 16
             depth++;
-            if(node.is_terminal()){ // if is terminal O(1)
+            if(node->is_terminal()){ // if is terminal O(1)
                 break;
             }
+
         }
         if(depth > max_depth){
             max_depth = depth;
         }
-        if(node.parent != nullptr){
-            if(node.is_terminal()){ // recall value O(1)
-                node.update(node.terminal_value); // O(1)
+        if(node->parent != nullptr){
+            if(node->is_terminal()){ // recall value O(1)
+                node->update(node->terminal_value); // O(1)
                 continue;
             }
         }
 
-        Node expanded = node.make_move(node.get_random_move()); // get is O(n)
 
-        int result = Game::result(expanded.board.light, expanded.board.dark);
+        Node* expanded = node->make_move(node->get_random_move()); // get is O(n)
+
+        int result = Game::result(expanded->board.light, expanded->board.dark);
 
         if(result != -1){
-            expanded.set_terminal(true);
-            expanded.set_terminal_value(result, 1);
+            expanded->set_terminal(true);
+            expanded->set_terminal_value(result, 1);
         } else {
-            result = Game::simulate(expanded.board.light, expanded.board.dark, expanded.board.turn);
+            //Game::print_board(expanded.board.light, expanded.board.dark);
+            result = Game::simulate(expanded->board.light, expanded->board.dark, expanded->board.turn);
+            cout << "hello ";
+
         }
-        expanded.update(result);
+        cout << (expanded->parent) <<" ";
+        cout << (expanded->parent)->parent << endl;
+        expanded->update(result);
+
+
+
     }
 
     return max_depth;

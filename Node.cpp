@@ -29,17 +29,20 @@ Node::Node(Node* parent, int move) {
 }
 
 void Node::update(int value) {
+    //cout << endl << "update" << endl;
     wins += value;
     visits++;
+
     if(parent != nullptr) parent->update(value);
 }
 
-Node Node::select_child() {
+Node* Node::select_child() {
     cout << "start select child" << endl;
     cout << this << endl;
 
+
     for(int i = 0; i < children.size(); i++){
-        cout << " " << children[i];
+        //cout << " " << children[i];
     }
 
     Node* best_node = children[0];
@@ -73,7 +76,7 @@ Node Node::select_child() {
     }
     cout << "end select child" << endl;
 
-    return *best_node;
+    return best_node;
 }
 
 double Node::uct(){
@@ -86,7 +89,7 @@ bool Node::is_expandable() {
     return !to_expand.empty();
 }
 
-Node Node::make_move(int move) {
+Node* Node::make_move(int move) {
     Node* creation = new Node(this, move);
 
     if(move < 48){
@@ -101,7 +104,7 @@ Node Node::make_move(int move) {
     creation->board.turn = !this -> board.turn;
     children.push_back(creation);
     to_expand.pop_back();
-    return *creation;
+    return creation;
 }
 
 int Node::get_random_move() {

@@ -48,10 +48,10 @@ public:
     Node* get_child(int move);
     Node(Node::State s, vector<int> moves);
     int get_random_move();
-    Node make_move(int move);
+    Node* make_move(int move);
     bool is_expandable();
     double uct();
-    Node select_child();
+    Node* select_child();
     bool is_terminal();
 
 };
