@@ -20,13 +20,9 @@ private:
     int terminal_sum;
 
 public:
-    struct State {
-        unsigned long long light = 0ULL;
-        unsigned long long dark = 0ULL;
-        bool turn = true;
-    };
-
-    double uct_score;
+    uint64_t light = 0ULL;
+    uint64_t dark = 0ULL;
+    bool turn = true;
 
     int wins = 0;
     int visits = 0;
@@ -37,20 +33,13 @@ public:
     vector<int> all_moves;
     vector<int> to_expand;
     vector<Node*> children;
-    State board;
 
-    unsigned seed = std::random_device()();
+    Node(Node *parent, int &move);
 
-
-    Node(Node *parent, int move);
-
-    void update(int value);
+    void update(int &value);
     void set_terminal(bool terminal);
     void set_terminal_value(int terminal_value, int depth);
-    vector<Node*> get_children();
-    int get_last_move();
-    Node* get_child(int move);
-    Node(Node::State s, vector<int> moves);
+    Node(uint64_t light, uint64_t dark, bool turn, vector<int> moves);
     int get_random_move(int random);
     Node* make_move(int move);
     bool is_expandable();

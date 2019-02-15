@@ -5,11 +5,11 @@
 #include "Game.h"
 #include "Node.h"
 #include <random>
-#include <time.h>
+#include <ctime>
 
 using namespace std;
 
-void Game::make_move(int& move, unsigned long long int &light, unsigned long long int &dark, bool &turn) {
+void Game::make_move(int& move, uint64_t &light, uint64_t &dark, bool &turn) {
     if(turn){
         light |= (1ULL << move);
     } else {
@@ -18,7 +18,7 @@ void Game::make_move(int& move, unsigned long long int &light, unsigned long lon
     turn = !turn;
 }
 
-void Game::print_board(unsigned long long int &light, unsigned long long int &dark) {
+void Game::print_board(uint64_t &light, uint64_t &dark) {
 
     for(unsigned int i = 0; i < 64; i++){
         if(i % 4 == 0) cout << endl;
@@ -30,37 +30,52 @@ void Game::print_board(unsigned long long int &light, unsigned long long int &da
     cout << endl;
 }
 
-bool Game::is_terminal(unsigned long long int &light, unsigned long long int &dark) {
+bool Game::informed_is_terminal(uint64_t &light, uint64_t &dark, int last_move) {
     if(0 == ~(light | dark)) return true;
 
     for (auto array : win_list) {
-        if (light & (1ULL << array[3]) && light & (1ULL << array[2])
-            && light & (1ULL << array[1]) && light & (1ULL << array[0])) {
+        if (light & (1ULL << array[0]) && light & (1ULL << array[1])
+            && light & (1ULL << array[2]) && light & (1ULL << array[3])) {
             return true;
         }
-        if (dark & (1ULL << array[3]) && dark & (1ULL << array[2])
-            && dark & (1ULL << array[1]) && dark & (1ULL << array[0])) {
+        if (dark & (1ULL << array[0]) && dark & (1ULL << array[1])
+            && dark & (1ULL << array[2]) && dark & (1ULL << array[3])) {
+            return true;
+        }
+    }
+}
+
+bool Game::is_terminal(uint64_t &light, uint64_t &dark) {
+    if(0 == ~(light | dark)) return true;
+
+    for (auto array : win_list) {
+        if (light & (1ULL << array[0]) && light & (1ULL << array[1])
+            && light & (1ULL << array[2]) && light & (1ULL << array[3])) {
+            return true;
+        }
+        if (dark & (1ULL << array[0]) && dark & (1ULL << array[1])
+            && dark & (1ULL << array[2]) && dark & (1ULL << array[3])) {
             return true;
         }
     }
     return false;
 }
 
-int Game::result(unsigned long long int &light, unsigned long long int &dark) {
+int Game::result(uint64_t &light, uint64_t &dark) {
     for (auto array : win_list) {
-        if (light & (1ULL << array[3])) {
-            if (light & (1ULL << array[2])) {
-                if (light & (1ULL << array[1])) {
-                    if (light & (1ULL << array[0])) {
+        if (light & (1ULL << array[0])) {
+            if (light & (1ULL << array[1])) {
+                if (light & (1ULL << array[2])) {
+                    if (light & (1ULL << array[3])) {
                         return 2;
                     }
                 }
             }
         }
-        if (dark & (1ULL << array[3])) {
-            if (dark & (1ULL << array[2])) {
-                if (dark & (1ULL << array[1])) {
-                    if (dark & (1ULL << array[0])) {
+        if (dark & (1ULL << array[0])) {
+            if (dark & (1ULL << array[1])) {
+                if (dark & (1ULL << array[2])) {
+                    if (dark & (1ULL << array[3])) {
                         return -2;
                     }
                 }
@@ -74,13 +89,14 @@ int Game::result(unsigned long long int &light, unsigned long long int &dark) {
     return -1;
 }
 
-int Game::simulate(unsigned long long int light, unsigned long long int dark, bool turn, vector<int> moves) {
+int Game::simulate(uint64_t light, uint64_t dark, bool turn, vector<int> moves) {
 
     unsigned seed = std::random_device()();
     std::mt19937 random(seed);
 
     while(!Game::is_terminal(light, dark)){
-        int rand_int = random() % moves.size();
+        std::uniform_int_distribution<> dist(0, moves.size()-1);
+        int rand_int = dist(random);
         int move = moves[rand_int];
         make_move(move, light, dark, turn);
         moves[rand_int] = moves.back();
@@ -91,7 +107,7 @@ int Game::simulate(unsigned long long int light, unsigned long long int dark, bo
 
 }
 
-vector<int> Game::get_moves(unsigned long long int &light, unsigned long long int &dark) {
+vector<int> Game::get_moves(uint64_t &light, uint64_t &dark) {
 
     vector<int> moves;
     unsigned long long int empty = ~(dark | light);
@@ -107,15 +123,14 @@ vector<int> Game::get_moves(unsigned long long int &light, unsigned long long in
     return moves;
 }
 
-int Game::runUCT(Node::State s, double limit) {
-    Node* root = new Node(s, get_moves(s.light, s.dark));
+int Game::runUCT(uint64_t light, uint64_t dark, bool turn, double limit) {
+    Node* root = new Node(light, dark, turn, get_moves(light, dark));
 
     int max_depth = 0;
     int it = 0;
 
     std::random_device rd;
     std::mt19937 eng(rd());
-    std::uniform_int_distribution<> dist(0, 15);
 
     time_t start = time(nullptr);
     time_t duration = (time(nullptr) - start);
@@ -143,17 +158,16 @@ int Game::runUCT(Node::State s, double limit) {
             }
         }
 
-
+        std::uniform_int_distribution<> dist(0, node->to_expand.size()-1);
         Node* expanded = node->make_move(node->get_random_move(dist(eng))); // get is O(n)
 
-        int result = Game::result(expanded->board.light, expanded->board.dark);
+        int result = Game::result(expanded->light, expanded->dark);
 
         if(result != -1){
             expanded->set_terminal(true);
             expanded->set_terminal_value(result, 1);
         } else {
-            //Game::print_board(expanded.board.light, expanded.board.dark);
-            result = Game::simulate(expanded->board.light, expanded->board.dark, expanded->board.turn, expanded->all_moves);
+            result = Game::simulate(expanded->light, expanded->dark, expanded->turn, expanded->all_moves);
         }
         expanded->update(result);
         duration = (time(nullptr) - start);
@@ -174,25 +188,9 @@ int Game::runUCT(Node::State s, double limit) {
         }
     }
 
-
     cout << endl << "Best Move: " << best_node->last_move << endl;
     return best_node->last_move;
 }
 
 constexpr unsigned int Game::win_list[76][4];
 
-
-/*
- * Alternative get_moves()
- *
-    for(int i = 0; i < 16; i++){
-        for(int j = 0; j < 4; j++){
-            unsigned long long int shift = 1ULL << (i + 16*j);
-            if(empty & shift){
-                moves.push_back(shift);
-                break;
-            }
-        }
-    }
- *
- */

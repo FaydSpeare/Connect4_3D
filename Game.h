@@ -41,13 +41,14 @@ public:
             {12, 24, 36, 48}, {13, 25, 37, 49}, {14, 26, 38, 50}, {15, 27, 39, 51}
     };
 
-    static void make_move(int& move, unsigned long long int &light, unsigned long long int &dark, bool &turn);
-    static void print_board(unsigned long long int &light, unsigned long long int &dark);
-    static bool is_terminal(unsigned long long int &light, unsigned long long int &dark);
-    static int result(unsigned long long int &light, unsigned long long int &dark);
-    static vector<int> get_moves(unsigned long long int &light, unsigned long long int &dark);
-    static int simulate(unsigned long long int light, unsigned long long int dark, bool turn, vector<int> moves);
-    static int runUCT(Node::State s, double limit);
+    static void make_move(int& move, uint64_t &light, uint64_t &dark, bool &turn);
+    static void print_board(uint64_t &light, uint64_t &dark);
+    static bool is_terminal(uint64_t &light, uint64_t &dark);
+    static bool informed_is_terminal(uint64_t &light, uint64_t &dark, int last_move);
+    static int result(uint64_t &light, uint64_t &dark);
+    static vector<int> get_moves(uint64_t &light, uint64_t &dark);
+    static int simulate(uint64_t light, uint64_t dark, bool turn, vector<int> moves);
+    static int runUCT(uint64_t light, uint64_t dark, bool turn, double limit);
 
 
 };

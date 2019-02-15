@@ -13,32 +13,31 @@ int main() {
 
     //auto start = chrono::steady_clock::now();
 
-    Node::State state;
-    state.light = 0b0;
-    state.dark = 0b0;
-    state.turn = true;
-    Node n(state, Game::get_moves(state.light, state.dark));
+    uint64_t light = 0b0;
+    uint64_t dark = 0b0;
+    bool turn = true;
+    Node n(light, dark, turn, Game::get_moves(light, dark));
 
-    while(!Game::is_terminal(state.light, state.dark)){
-        int move = Game::runUCT(state, 5.0);
-        if(state.turn){
-            state.light |= (1ULL << move);
+    while(!Game::is_terminal(light, dark)){
+        int move = Game::runUCT(light, dark, turn, 5.0);
+        if(turn){
+            light |= (1ULL << move);
         } else {
-            state.dark |= (1ULL << move);
+            dark |= (1ULL << move);
         }
-        state.turn = !state.turn;
+        turn = !turn;
 
-        Game::print_board(state.light, state.dark);
+        Game::print_board(light, dark);
         int c;
         cout << "enter move: " << endl;
         cin >> c;
 
-        if(state.turn){
-            state.light |= (1ULL << c);
+        if(turn){
+            light |= (1ULL << c);
         } else {
-            state.dark |= (1ULL << c);
+            dark |= (1ULL << c);
         }
-        state.turn = !state.turn;
+        turn = !turn;
 
     }
 

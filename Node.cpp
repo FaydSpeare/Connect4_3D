@@ -5,46 +5,30 @@
 #include "Node.h"
 #include <random>
 
-Node::Node(Node* parent, int move) {
-
+Node::Node(Node* parent, int &move) {
     this -> parent = parent;
     last_move = move;
-
-
-    /*
-    cout << this << endl;
-    cout << last_move << endl;
-    cout << parent << endl;
-     */
-
     for(int i: parent -> all_moves){
         if(i != move) all_moves.push_back(i);
     }
-
     to_expand = all_moves;
-
-    board = parent -> board;
+    light = parent->light;
+    dark = parent->dark;
+    turn = parent->turn;
 }
 
-void Node::update(int value) {
-    //cout << endl << "update" << endl;
+void Node::update(int &value) {
     wins += value;
     visits++;
-
     if(parent != nullptr) parent->update(value);
 }
 
 Node* Node::select_child() {
-    //cout << "start select child" << endl;
-    //cout << this << endl;
 
-
-    Node* best_node = children[0];
+    Node* best_node = nullptr;
     double best_score = children[0] -> uct();
 
-
-    if(!board.turn){
-
+    if(!turn){
         for(Node* n: children){
             double uct = n -> uct();
             if(uct <= best_score){
@@ -54,26 +38,19 @@ Node* Node::select_child() {
         }
     } else {
         for(Node* n: children){
-
-            double expand = std::sqrt(3.0 * std::log(double(n->parent->visits))/double(n->visits));
-            if(n->board.turn) expand *= -1.0;
-            double uct = double(n->wins)/double(n->visits) + expand;
-
-
+            double uct =  n -> uct();
             if(uct >= best_score){
                 best_node = n;
                 best_score = uct;
             }
         }
     }
-    //cout << best_node << endl;
-    //cout << "end select child" << endl;
     return best_node;
 }
 
 double Node::uct(){
     double expand = std::sqrt(2.5 * std::log(double(parent->visits))/double(this->visits));
-    if(board.turn) expand *= -1.0;
+    if(turn) expand *= -1.0;
     return double(this->wins)/double(this->visits) + expand;
 }
 
@@ -82,7 +59,7 @@ bool Node::is_expandable() {
 }
 
 Node* Node::make_move(int move) {
-    Node* creation = new Node(this, move);
+    auto creation = new Node(this, move);
 
     if(move < 48){
         int new_move = move + 16;
@@ -90,24 +67,25 @@ Node* Node::make_move(int move) {
         creation->all_moves.push_back(new_move);
     }
 
-    if(board.turn) creation->board.light |= (1ULL << move);
-    else creation->board.dark |= (1ULL << move);
+    if(turn) creation->light |= (1ULL << move);
+    else creation->dark |= (1ULL << move);
 
-    creation->board.turn = !this -> board.turn;
+    creation->turn = !this -> turn;
     children.push_back(creation);
     to_expand.pop_back();
     return creation;
 }
 
 int Node::get_random_move(int random) {
-    int index = random % to_expand.size();
-    int move = to_expand[index];
-    to_expand[index] = to_expand.back();
+    short move = to_expand[random];
+    to_expand[random] = to_expand.back();
     return move;
 }
 
-Node::Node(Node::State s, vector<int> const moves) {
-    board = s;
+Node::Node(uint64_t l, uint64_t d, bool t, vector<int> const moves) {
+    light = l;
+    dark = d;
+    turn = t;
     parent = nullptr;
     all_moves = moves;
     to_expand = all_moves;
@@ -125,7 +103,7 @@ void Node::set_terminal_value(int terminal_value, int depth) {
     if(parent != nullptr){
         depth++;
 
-        if(parent -> board.turn){
+        if(parent -> turn){
             if(terminal_value == 2){
                 parent -> set_terminal_value(terminal_value, depth);
             }
@@ -149,21 +127,6 @@ void Node::set_terminal_value(int terminal_value, int depth) {
         }
     }
 
-}
-
-vector<Node*> Node::get_children() {
-    return children;
-}
-
-int Node::get_last_move() {
-    return last_move;
-}
-
-Node* Node::get_child(int move) {
-    for(Node* n: children){
-        if(n->last_move == move) return n;
-    }
-    return nullptr;
 }
 
 bool Node::is_terminal() {
