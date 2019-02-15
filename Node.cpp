@@ -99,10 +99,8 @@ Node* Node::make_move(int move) {
     return creation;
 }
 
-int Node::get_random_move() {
-    unsigned seed = std::random_device()();
-    std::mt19937 random(seed);
-    int index = random() % to_expand.size();
+int Node::get_random_move(int random) {
+    int index = random % to_expand.size();
     int move = to_expand[index];
     to_expand[index] = to_expand.back();
     return move;

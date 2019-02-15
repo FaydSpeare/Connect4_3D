@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "Node.h"
 #include <random>
+#include <time.h>
 
 using namespace std;
 
@@ -73,8 +74,7 @@ int Game::result(unsigned long long int &light, unsigned long long int &dark) {
     return -1;
 }
 
-int Game::simulate(unsigned long long int light, unsigned long long int dark, bool turn) {
-    vector<int> moves = get_moves(light, dark);
+int Game::simulate(unsigned long long int light, unsigned long long int dark, bool turn, vector<int> moves) {
 
     unsigned seed = std::random_device()();
     std::mt19937 random(seed);
@@ -107,32 +107,25 @@ vector<int> Game::get_moves(unsigned long long int &light, unsigned long long in
     return moves;
 }
 
-int Game::runUCT(Node::State s) {
+int Game::runUCT(Node::State s, double limit) {
     Node* root = new Node(s, get_moves(s.light, s.dark));
 
     int max_depth = 0;
     int it = 0;
 
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<> dist(0, 15);
 
-    while(it < 100000){
+    time_t start = time(nullptr);
+    time_t duration = (time(nullptr) - start);
+    while(duration < limit){
         Node* node = root;
-
-        //cout << it << " ";
         it++;
 
         int depth = 0;
 
-        /*
-        cout<<it <<endl;
-        for(int i = 0; i < node.children.size(); i++){
-            cout << " node: " << node.children[i];
-            node.children[i];
-        }
-        cout<<endl;
-         */
-
         while(!node->is_expandable()){ // O(1)
-            //cout << "here" << endl;
             node = node->select_child(); // O(n) n = 16
             depth++;
             if(node->is_terminal()){ // if is terminal O(1)
@@ -151,7 +144,7 @@ int Game::runUCT(Node::State s) {
         }
 
 
-        Node* expanded = node->make_move(node->get_random_move()); // get is O(n)
+        Node* expanded = node->make_move(node->get_random_move(dist(eng))); // get is O(n)
 
         int result = Game::result(expanded->board.light, expanded->board.dark);
 
@@ -160,15 +153,16 @@ int Game::runUCT(Node::State s) {
             expanded->set_terminal_value(result, 1);
         } else {
             //Game::print_board(expanded.board.light, expanded.board.dark);
-            result = Game::simulate(expanded->board.light, expanded->board.dark, expanded->board.turn);
+            result = Game::simulate(expanded->board.light, expanded->board.dark, expanded->board.turn, expanded->all_moves);
         }
         expanded->update(result);
+        duration = (time(nullptr) - start);
     }
 
     Node* best_node = root->children[0];
     double best_score = double(root->children[0]->wins) / double(root->children[0]->visits);
 
-    cout << endl << "Best Move: " << best_node->last_move << endl;
+    cout << endl << "Nodes: " << it << " Nodes/sec: " << it/duration << endl;
 
     for(Node* n: root->children){
         double score = double(n -> wins) / double(n -> visits);
@@ -182,7 +176,7 @@ int Game::runUCT(Node::State s) {
 
 
     cout << endl << "Best Move: " << best_node->last_move << endl;
-    return max_depth;
+    return best_node->last_move;
 }
 
 constexpr unsigned int Game::win_list[76][4];

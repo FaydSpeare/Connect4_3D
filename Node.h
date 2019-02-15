@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -38,6 +39,9 @@ public:
     vector<Node*> children;
     State board;
 
+    unsigned seed = std::random_device()();
+
+
     Node(Node *parent, int move);
 
     void update(int value);
@@ -47,7 +51,7 @@ public:
     int get_last_move();
     Node* get_child(int move);
     Node(Node::State s, vector<int> moves);
-    int get_random_move();
+    int get_random_move(int random);
     Node* make_move(int move);
     bool is_expandable();
     double uct();

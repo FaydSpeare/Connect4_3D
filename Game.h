@@ -18,6 +18,7 @@ using namespace std;
 class Game {
 
 public:
+
     static constexpr unsigned int win_list[76][4] = {
             {0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15},
             {0, 5, 10, 15}, {3, 6, 9, 12}, {0, 4, 8, 12}, {1, 5, 9, 13},
@@ -45,8 +46,8 @@ public:
     static bool is_terminal(unsigned long long int &light, unsigned long long int &dark);
     static int result(unsigned long long int &light, unsigned long long int &dark);
     static vector<int> get_moves(unsigned long long int &light, unsigned long long int &dark);
-    static int simulate(unsigned long long int light, unsigned long long int dark, bool turn);
-    static int runUCT(Node::State s);
+    static int simulate(unsigned long long int light, unsigned long long int dark, bool turn, vector<int> moves);
+    static int runUCT(Node::State s, double limit);
 
 
 };
