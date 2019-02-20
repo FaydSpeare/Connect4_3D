@@ -44,3 +44,5 @@ Top Layer:
 | 52 | 53 | 54 | 55 |
 | 56 | 57 | 58 | 59 |
 | 60 | 61 | 62 | 63 |
+
+Once the engine's thinking time is up, it will make it's move and display the board, which is repesented similarly to how the moves are displayed above. The engine will also display the information about the moves it analysed during its search.
