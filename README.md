@@ -46,3 +46,9 @@ Top Layer:
 | 60 | 61 | 62 | 63 |
 
 Once the engine's thinking time is up, it will make it's move and display the board, which is repesented similarly to how the moves are displayed above. The engine will also display the information about the moves it analysed during its search.
+
+
+#### To assist in visualising how these layers stack up:
+
+![image](https://upload.wikimedia.org/wikipedia/commons/4/41/Connect4_3D.JPG)
+
